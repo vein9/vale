@@ -2,11 +2,13 @@ import {
   Paper, Card, CardContent, Typography, CardActions, Button,
   IconButton, CardHeader, Avatar, Checkbox, makeStyles, createStyles, Grid, Box, Container
 } from '@material-ui/core'
-import { MoreVert, Delete, Check } from '@material-ui/icons'
+import { MoreVert, Delete, Check, CollectionsBookmarkOutlined } from '@material-ui/icons'
 import { ListItem } from '@material-ui/core'
-import React from 'react'
+import React, { useState } from 'react'
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
-
+import AreYouSure from './AreYouSure'
+import { useEffect } from 'react';
+import updateDocument from '../firebase/updateDocument';
 const useStyles = makeStyles((theme) => createStyles({
   todoReady: {
     background: 'white',
@@ -17,7 +19,7 @@ const useStyles = makeStyles((theme) => createStyles({
   todo: {
     background: 'white',
     width: '100%',
-    opacity: 0.1
+    opacity: 0.3
     // background: 'yellow'
   },
   time: {
@@ -49,17 +51,37 @@ const useStyles = makeStyles((theme) => createStyles({
 }))
 
 export default function Todo(props) {
-  const { ready } = props
+  const { i, todo, ready } = props
+  const { seconds } = todo.startDate
   const classes = useStyles()
+
+  const toDate = (secs) => {
+    let t = new Date(secs * 1000)
+    // t.setDate(t.getDate() + 1)
+    console.log(new Date().getDate())
+    console.log(t.getDate())
+    return t
+  }
+
+  const toDateString = (secs) => {
+    let t = new Date(secs * 1000)
+    t.setDate(t.getDate() + 1)
+    return t.toISOString().split('T')[0]
+  }
+  const handleVote = () => {
+    updateDocument('todos', todo.id, 'vote', todo.vote + 1)
+  }
+  const handleDone = () => {
+    updateDocument('todos', todo.id, 'done', true)
+  }
   return (
     <ListItem >
-      <Card className={ready ? classes.todoReady : classes.todo}  >
+      <Card className={new Date().getDate() === toDate(seconds).getDate() ? classes.todoReady : classes.todo}  >
         <CardHeader
-          avatar={<Avatar aria-label="recipe">1</Avatar>}
+          avatar={<Avatar aria-label="recipe">{i + 1} </Avatar>}
           title={
             <Box className={classes.time}>
-              <Typography variant='h6' component='h5' className={classes.startTime} >3h 6/9/2020</Typography>
-              <Typography variant='h6' component='h5' className={classes.endTime} >23h 8/9/2020</Typography>
+              <Typography variant='h6' component='h5' className={classes.startTime} >{toDateString(seconds)}</Typography>
             </Box>
           }
         >
@@ -67,17 +89,16 @@ export default function Todo(props) {
         </CardHeader>
         <CardContent>
           <Typography variant='h5'>
-            rua chen quyet nha lau nha tam rua
+            {todo.text}
           </Typography>
         </CardContent>
         <CardActions className={classes.bar}>
 
           <Box>
-            <Button variant='outlined' endIcon={<ArrowUpwardIcon />} color='secondary'>2</Button>
-            <Button variant='contained' className={classes.done} endIcon={<Check />} color='primary'>Done</Button>
+            <Button onClick={handleVote} variant='outlined' endIcon={<ArrowUpwardIcon />} color='secondary'>{todo.vote}</Button>
+            <Button onClick={handleDone} variant='contained' className={classes.done}
+              endIcon={<Check />} color='primary'>Done</Button>
           </Box>
-          <Button variant='outlined' endIcon={<Delete />} color='secondary'>delete</Button>
-
 
         </CardActions>
       </Card>

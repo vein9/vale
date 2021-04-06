@@ -1,14 +1,17 @@
 import { List } from '@material-ui/core'
 import React from 'react'
 import Todo from './Todo'
-export default function TodoList() {
-
+export default function TodoList(props) {
+  const { todoList } = props
   return (
     <List>
-      <Todo ready={true} />
-      <Todo />
-      <Todo />
-      <Todo />
+      {
+        todoList.map((todo, i) => {
+          return (
+            <Todo key={todo.id} todo={todo} ready={true} i={i} />
+          )
+        })
+      }
 
     </List>
   )

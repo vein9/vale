@@ -2,12 +2,15 @@ import { Box, Button, TextField, IconButton } from '@material-ui/core'
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 import TodoList from './components/TodoList'
 import { Add } from '@material-ui/icons';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import DayOfMonth from './components/DayOfMonth'
 import DayOfWeek from './components/DayOfWeek'
+import uploadTodo from './firebase/uploadTodo'
+import getTodoList from './firebase/getTodoList';
 
 const useStyles = makeStyles((theme) => createStyles({
   app: {
+    height: '100%',
     backgroundColor: '#78909c',
   },
   form: {
@@ -30,10 +33,40 @@ export default function App() {
   const [dayOfMonth, setDayOfMonth] = useState(null)
   const [dayOfWeek, setDayOfWeek] = useState(null)
 
+  const todoList = getTodoList()
+
+  useEffect(() => {
+    console.log(todoList)
+  }, [todoList])
 
   const handleCreateTask = e => {
     e.preventDefault()
-    alert(taskName)
+    console.log('create task called')
+
+    let today = new Date()
+
+    if (dayOfWeek !== null && dayOfWeek !== undefined) {
+      // console.log('datofweek:', dayOfWeek)
+      let distance = dayOfWeek - today.getDay()
+      today.setDate(distance + today.getDate())
+    }
+
+    if (dayOfMonth) {
+      today.setDate(dayOfMonth)
+    }
+    console.log('today:', today)
+
+    let newTodo = {
+      done: false,
+      startDate: today,
+      vote: 0,
+      text: taskName,
+    }
+    uploadTodo(newTodo)
+
+
+    setDayOfMonth(null)
+    setDayOfWeek(null)
     setTaskName('')
   }
 
@@ -60,9 +93,10 @@ export default function App() {
           <Add fontSize='large' color='primary' />
         </IconButton>
       </form>
-
-      <TodoList />
-
+      {
+        todoList.length > 0 &&
+        <TodoList todoList={todoList} />
+      }
 
     </Box>
 

@@ -37,7 +37,7 @@ export default function NestedList(props) {
         <ListItemIcon>
           <ViewWeekIcon />
         </ListItemIcon>
-        <ListItemText primary="Week" />
+        <ListItemText primary="day ... of week (optional)" />
         {open ? <ExpandLess /> : <ExpandMore />}
       </ListItem>
 
@@ -51,7 +51,7 @@ export default function NestedList(props) {
           {
             ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].map((day, i) => {
               return (
-                <ListItem onClick={() => { setDayOfWeek(day); setDayOfMonth(null); setOpen(false) }} key={i} button className={classes.nested}>
+                <ListItem onClick={() => { setDayOfWeek(i + 1); setDayOfMonth(null); setOpen(false) }} key={i} button className={classes.nested}>
                   <ListItemIcon>
                     <StarBorder />
                   </ListItemIcon>
